@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Лабораторная работа по веб-программированию №1</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header class="header">
+      <h2>Рожкова Александра Владимировна</h2>
+     <h2>Группа: P3214 | Вариант: 501880</h2>
+    </header>
+
+    <main class="content">
+        <canvas id="canvas" width="448" height="448"></canvas>
+
+        <form id="point" class="form" novalidate>
+            <fieldset class="form__group">
+                <legend>Выберите значение координаты X:</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="x" value="-3" required /> -3</label>
+                    <label><input type="radio" name="x" value="-2" /> -2</label>
+                    <label><input type="radio" name="x" value="-1" /> -1</label>
+                    <label><input type="radio" name="x" value="0" /> 0</label>
+                    <label><input type="radio" name="x" value="1" /> 1</label>
+                    <label><input type="radio" name="x" value="2" /> 2</label>
+                    <label><input type="radio" name="x" value="3" /> 3</label>
+                    <label><input type="radio" name="x" value="4" /> 4</label>
+                    <label><input type="radio" name="x" value="5" /> 5</label>
+                </div>
+            </fieldset>
+
+            <fieldset class="form__group">
+                <label for="y-input">Введите значение координаты Y:</label>
+                <input
+                    id="y-input"
+                    name="y"
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="-3...3"
+                    required
+                    pattern="^-?\d+(\.\d+)?$"
+                    data-min="-3"
+                    data-max="3"
+                    title="Число от -3 до 3"
+                />
+                <span class="error" id="y-error"></span>
+            </fieldset>
+
+            <fieldset class="form__group">
+                <label for="r-input">Введите значение радиуса R:</label>
+                <input
+                    id="r-input"
+                    name="r"
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="2 ... 5"
+                    required
+                    pattern="^-?\d+(\.\d+)?$"
+                    data-min="2"
+                    data-max="5"
+                    title="Число от 2 до 5"
+                />
+                <span class="error" id="r-error"></span>
+            </fieldset>
+
+            <button type="submit" class="form-submit">Проверить</button>
+        </form>
+    </main>
+
+    <section class="result">
+        <table class="result__table" id="result-table">
+            <thead>
+            <tr>
+                <th>X</th>
+                <th>Y</th>
+                <th>R</th>
+                <th>Результат</th>
+                <th>Время</th>
+            </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+        </table>
+    </section>
+
+<script src="src/script.js"></script>
+
+</body>
+
+</html>
