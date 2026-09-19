@@ -122,6 +122,10 @@ function coordinateAxis() {
     ctx.fillText('x', Math.round(W - 40), Math.round(cy - 14));
     ctx.fillText('y', Math.round(cx + 16), 28);
 
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, W - 2, H - 2);
+
 }
 
 setupCanvas();
