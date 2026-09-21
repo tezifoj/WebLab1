@@ -36,13 +36,13 @@
                 <input
                     id="y-input"
                     name="y"
-                    type="text"
+                    type="number"
                     inputmode="decimal"
                     placeholder="-3 ... 3"
                     required
-                    pattern="^-?\d+(\.\d+)?$"
-                    data-min="-3"
-                    data-max="3"
+                    min="-3"
+                    max="3"
+                    step="any"
                     title="Число от -3 до 3"
                 />
                 <span class="error" id="y-error"></span>
@@ -53,13 +53,13 @@
                 <input
                     id="r-input"
                     name="r"
-                    type="text"
+                    type="number"
                     inputmode="decimal"
                     placeholder="2 ... 5"
                     required
-                    pattern="^-?\d+(\.\d+)?$"
-                    data-min="2"
-                    data-max="5"
+                    min="2"
+                    max="5"
+                    step="any"
                     title="Число от 2 до 5"
                 />
                 <span class="error" id="r-error"></span>

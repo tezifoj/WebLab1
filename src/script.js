@@ -286,6 +286,7 @@ function validateNumberInput(input, min, max) {
             errorValue.textContent = `Число от ${min} до ${max}`;
         }
         input.classList.add("invalid");
+        return null;
     }
     return num;
 }

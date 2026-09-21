@@ -80,7 +80,7 @@ canvas {
     font-size: 20px;
 }
 
-.form__group input[type="text"] {
+.form__group input[type="number"] {
     padding: 10px 14px;
     margin-top: 4px;
     border: 1px solid #9c9a9a;
@@ -92,16 +92,16 @@ canvas {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form__group input[type="text"]:hover {
+.form__group input[type="number"]:hover {
     border-color: #666565;
 }
 
-.form__group input[type="text"]:invalid {
+.form__group input[type="number"].invalid {
     border-color: #de3131;
     background: #fff0f0;
 }
 
-.form__group input[type="text"]:valid {
+.form__group input[type="number"]:valid {
     border-color: #20b020;
     background: #e6fce6;
 }
