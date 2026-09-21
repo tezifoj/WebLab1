@@ -40,7 +40,7 @@ body {
     gap: 40px;
     flex-wrap: nowrap;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
     max-width: 960px;
     padding: 40px 16px;
@@ -165,4 +165,16 @@ canvas {
     overflow: hidden;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     font-size: 18px;
+}
+
+.results__table th,
+.results__table td {
+    padding: 10px 12px;
+    text-align: center;
+}
+
+.results__table thead th {
+    background: #80d7ff;
+    color: #072736;
+    font-family: serif;
 }

@@ -128,5 +128,222 @@ function coordinateAxis() {
 
 }
 
+const MIN_R = 2;
+const MAX_R = 5;
+
+function getScale() {
+    const canvas = document.getElementById("canvas");
+    const W = canvas.clientWidth;
+    return (W / 2 - 64) / MAX_R;
+}
+
+function toPx(x, y) {
+    const canvas = document.getElementById("canvas");
+    const W = canvas.clientWidth;
+    const H = canvas.clientHeight;
+    const step = 32;
+    const cx = Math.round(W / 2 / step) * step;
+    const cy = Math.round(H / 2 / step) * step;
+    const scale = getScale();
+    return {
+        px: cx + x * scale,
+        py: cy - y * scale,
+    };
+}
+
+function drawArea(R) {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "rgba(79, 152, 255, 0.5)";
+
+    ctx.beginPath();
+    const t1 = toPx(0, 0);
+    const t2 = toPx(-R, 0);
+    const t3 = toPx(0, R);
+    ctx.moveTo(t1.px, t1.py);
+    ctx.lineTo(t2.px, t2.py);
+    ctx.lineTo(t3.px, t3.py);
+    ctx.closePath();
+    ctx.fill();
+
+    const center = toPx(0, 0);
+    const radiusPx = (R / 2) * getScale();
+    ctx.beginPath();
+    ctx.moveTo(center.px, center.py);
+    ctx.arc(center.px, center.py, radiusPx, 0, Math.PI / 2, false);
+    ctx.closePath();
+    ctx.fill();
+
+    const c1 = toPx(-R /2, 0);
+    const c2 = toPx(0, -R);
+    ctx.fillRect(c1.px, c1.py, c2.px - c1.px, c2.py - c1.py);
+}
+
+function isHit(x, y, R) {
+    if (x <= 0 && y >= 0 && y <= x + R) return true;
+    if (x >= 0 && y <= 0 && (x * x + y * y) <= (R / 2) ** 2) return true;
+    if (x >= -R / 2 && x <= 0 && y >= -R && y <= 0) return true;
+    return false;
+}
+
+function drawPoint(x, y, R, hit) {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const p = toPx(x, y);
+
+    ctx.beginPath();
+    ctx.arc(p.px, p.py, 5, 0, Math.PI * 2);
+    ctx.fillStyle = hit ? "green" : "red";
+    ctx.fill();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function formatDate(iso) {
+    return new Date(iso).toLocaleString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+}
+
+const pointsStorageKey = 'app_points';
+
+function loadPoints() {
+    try {
+        const raw = localStorage.getItem(pointsStorageKey);
+        return raw ? JSON.parse(raw) : [];
+        } catch {
+        return [];
+    }
+}
+
+function savePoints(points) {
+    localStorage.setItem(pointsStorageKey, JSON.stringify(points));
+}
+
+function renderTable() {
+    const tbody = document.getElementById("results-body");
+    const points = loadPoints();
+    tbody.innerHTML = "";
+
+    points.forEach((p) => {
+        const tr = document.createElement("tr");
+
+        const tdX = document.createElement("td");
+        tdX.textContent = p.x;
+
+        const tdY = document.createElement("td");
+        tdY.textContent = p.y;
+
+        const tdR = document.createElement("td");
+        tdR.textContent = p.r;
+
+        const tdHit = document.createElement("td");
+        tdHit.className = p.hit ? "hit" : "miss";
+        tdHit.textContent = p.hit ? "Попадание" : "Промах";
+
+        const tdTime = document.createElement("td");
+        tdTime.textContent = formatDate(p.time);
+
+        tr.append(tdX, tdY, tdR, tdHit, tdTime);
+        tbody.appendChild(tr);
+
+    });
+}
+
+function validateNumberInput(input, min, max) {
+    const value = input.value.trim();
+    const errorValue = document.getElementById(input.id + "-error");
+    if (errorValue) errorValue.textContent = "";
+
+    input.classList.remove("invalid");
+
+    if (value === "") {
+        if (errorValue) {
+            errorValue.textContent = "Поле обязательно";
+        }
+        input.classList.add("invalid");
+        return null;
+    }
+
+    if (!/^-?\d+(\.\d+)?$/.test(value)) {
+        if (errorValue) {
+            errorValue.textContent = "Введите число";
+        }
+        input.classList.add("invalid");
+        return null;
+    }
+
+    const num = parseFloat(value);
+    if (num < min || num > max) {
+        if (errorValue) {
+            errorValue.textContent = `Число от ${min} до ${max}`;
+        }
+        input.classList.add("invalid");
+    }
+    return num;
+}
+
+let currentR = 2;
+function redrawAll() {
+    coordinateAxis();
+    drawArea(currentR);
+    const points = loadPoints();
+    points.forEach((p) => drawPoint(p.x, p.y, p.r, p.hit));
+}
+
+document.getElementById("point").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = event.target;
+
+    const xRadio = form.querySelector('input[name="x"]:checked');
+    if (!xRadio) {
+        alert("Выберите X");
+        return;
+    }
+
+    const x = parseFloat(xRadio.value);
+
+    const yInput = document.getElementById("y-input");
+    const rInput = document.getElementById("r-input");
+
+    const y = validateNumberInput(yInput, -3, 3);
+    const r = validateNumberInput(rInput, 2, 5);
+
+    if (y === null || r === null) return;
+
+    const hit = isHit(x, y, r);
+
+    const point = {
+        x, y, r, hit,
+        time: new Date().toISOString(),
+    };
+    const points = loadPoints();
+    points.push(point);
+    savePoints(points);
+    renderTable();
+    redrawAll();
+});
+
+document.getElementById("r-input").addEventListener("input", (e) => {
+    const val = parseFloat(e.target.value);
+    if (!isNaN(val) && val >= MIN_R && val <= MAX_R) {
+        currentR = val;
+        redrawAll();
+    }
+});
+
 setupCanvas();
 coordinateAxis();
+renderTable();
+
+window.addEventListener("resize", () => {
+    setupCanvas();
+    redrawAll();
+});
