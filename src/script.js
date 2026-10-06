@@ -232,7 +232,7 @@ function renderTable() {
     const points = loadPoints();
     tbody.innerHTML = "";
 
-    points.forEach((p) => {
+    points.reverse().forEach((p) => {
         const tr = document.createElement("tr");
 
         const tdX = document.createElement("td");
