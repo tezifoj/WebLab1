@@ -40,7 +40,7 @@ body {
     gap: 40px;
     flex-wrap: nowrap;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     max-width: 960px;
     padding: 40px 16px;
@@ -50,6 +50,7 @@ body {
 canvas {
     width: 450px;
     height: 450px;
+    margin-top: 30px;
     background: white;
     display: block;
 }
@@ -104,6 +105,23 @@ canvas {
 .form__group input[type="number"]:valid {
     border-color: #20b020;
     background: #e6fce6;
+}
+
+.form__group input[type="number"]::-webkit-outer-spin-button,
+.form__group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+    white-space: pre-line;
+}
+
+.invalid {
+    border: 2px solid red;
 }
 
 .radio-group {

@@ -259,36 +259,26 @@ function renderTable() {
 
 function validateNumberInput(input, min, max) {
     const value = input.value.trim();
-    const errorValue = document.getElementById(input.id + "-error");
-    if (errorValue) errorValue.textContent = "";
 
     input.classList.remove("invalid");
 
     if (value === "") {
-        if (errorValue) {
-            errorValue.textContent = "Поле обязательно";
-        }
         input.classList.add("invalid");
-        return null;
+        return {value: null, error: "Поле обязательно для заполнения"};
     }
 
     if (!/^-?\d+(\.\d+)?$/.test(value)) {
-        if (errorValue) {
-            errorValue.textContent = "Введите число";
-        }
         input.classList.add("invalid");
-        return null;
+        return {value: null, error: "Введите число"};
     }
 
-    const num = parseFloat(value);
-    if (num < min || num > max) {
-        if (errorValue) {
-            errorValue.textContent = `Число от ${min} до ${max}`;
-        }
+    const num = Number(value);
+
+    if (!Number.isFinite(num) || num < min || num > max) {
         input.classList.add("invalid");
-        return null;
+        return {value: null, error: `Число от ${min} до ${max}` };
     }
-    return num;
+    return {value: num, error: null };
 }
 
 let currentR = 2;
@@ -296,40 +286,59 @@ function redrawAll() {
     coordinateAxis();
     drawArea(currentR);
     const points = loadPoints();
-    points.forEach((p) => drawPoint(p.x, p.y, p.r, p.hit));
+
+    points.forEach((p) => {
+        const hit = isHit(p.x, p.y, currentR);
+        drawPoint(p.x, p.y, currentR, hit);
+    });
 }
+
+const errorMessage = document.getElementById("error-message");
 
 document.getElementById("point").addEventListener("submit", (event) => {
     event.preventDefault();
     const form = event.target;
 
     const xRadio = form.querySelector('input[name="x"]:checked');
-    if (!xRadio) {
-        alert("Выберите X");
-        return;
-    }
-
-    const x = parseFloat(xRadio.value);
-
     const yInput = document.getElementById("y-input");
     const rInput = document.getElementById("r-input");
 
-    const y = validateNumberInput(yInput, -3, 3);
-    const r = validateNumberInput(rInput, 2, 5);
+    const yRes = validateNumberInput(yInput, -3, 3);
+    const rRes = validateNumberInput(rInput, 2, 5);
 
-    if (y === null || r === null) return;
+    const messages = [];
+    if (!xRadio) messages.push("X: Выберите значение");
+    if (yRes.error !== null) messages.push("Y: " + yRes.error);
+    if (rRes.error !== null) messages.push("R: " + rRes.error);
 
+    if (messages.length > 0) {
+        errorMessage.textContent = messages.join("\n");
+        return;
+    }
+
+    errorMessage.textContent = "";
+
+    const x = parseFloat(xRadio.value);
+    const y = yRes.value;
+    const r = rRes.value;
     const hit = isHit(x, y, r);
 
     const point = {
         x, y, r, hit,
         time: new Date().toISOString(),
-    };
+    }
+
     const points = loadPoints();
     points.push(point);
     savePoints(points);
+
+    currentR = r;
     renderTable();
     redrawAll();
+});
+
+document.getElementById("point").addEventListener("input", () => {
+    errorMessage.textContent = "";
 });
 
 document.getElementById("r-input").addEventListener("input", (e) => {
