@@ -115,7 +115,6 @@ canvas {
 
 .error-message {
     color: red;
-    margin-top: 10px;
     font-size: 14px;
     white-space: pre-line;
 }
@@ -153,6 +152,29 @@ canvas {
     accent-color: #1e90ff;
 }
 
+
+.form__actions {
+    display: flex;
+    gap: 12px;
+}
+
+.form__actions button {
+    flex: 1;
+    white-space: nowrap;
+}
+
+.form__clear {
+    padding: 12px 20px;
+    border: none;
+    font-family: serif;
+    border-radius: 10px;
+    background: #80d7ff;
+    color: black;
+    font-size: 22px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
 .form__submit {
     padding: 12px 20px;
     border: none;
@@ -165,7 +187,9 @@ canvas {
     transition: background 0.2s;
 }
 
-.form__submit:hover {
+
+.form__submit:hover,
+.form__clear:hover {
     background: #4cc5fc;
 }
 

@@ -130,6 +130,9 @@ function coordinateAxis() {
 
 const MIN_R = 2;
 const MAX_R = 5;
+const MIN_Y = -3;
+const MAX_Y = 3;
+const ALLOWED_X = [-3, -2, -1, 0, 1, 2, 3, 4, 5];
 
 function getScale() {
     const canvas = document.getElementById("canvas");
@@ -214,14 +217,29 @@ function formatDate(iso) {
 
 const pointsStorageKey = 'app_points';
 
+function isValidPoint(p) {
+    return (
+        p !== null &&
+        typeof p === "object" &&
+        typeof p.x === "number" && ALLOWED_X.includes(p.x) &&
+        typeof p.y === "number" && Number.isFinite(p.y) && p.y >= MIN_Y && p.y <= MAX_Y &&
+        typeof p.r === "number" && Number.isFinite(p.r) && p.r >= MIN_R && p.r <= MAX_R &&
+        typeof p.time === "string" && !Number.isNaN(new Date(p.time).getTime())
+    );
+}
+
 function loadPoints() {
     try {
-        const raw = localStorage.getItem(pointsStorageKey);
-        return raw ? JSON.parse(raw) : [];
+            const raw = localStorage.getItem(pointsStorageKey);
+            const data = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(data)) return [];
+            return data
+                .filter(isValidPoint)
+                .map((p) => ({ ...p, hit: isHit(p.x, p.y, p.r) })); // результат пересчитываем, а не верим сохранённому
         } catch {
-        return [];
+            return [];
+        }
     }
-}
 
 function savePoints(points) {
     localStorage.setItem(pointsStorageKey, JSON.stringify(points));
@@ -281,6 +299,19 @@ function validateNumberInput(input, min, max) {
     return {value: num, error: null };
 }
 
+const xRadios = Array.from(document.querySelectorAll('input[name="x"]'));
+
+function getSelectedX() {
+    const idx = xRadios.findIndex((r) => r.checked);
+
+    if (idx === -1) {
+        return { value: null, error: "Выберите значение" };
+    }
+
+    // значение берём из JS-массива по позиции, а не из атрибута value
+    return { value: ALLOWED_X[idx], error: null };
+}
+
 let currentR = 2;
 function redrawAll() {
     coordinateAxis();
@@ -297,17 +328,16 @@ const errorMessage = document.getElementById("error-message");
 
 document.getElementById("point").addEventListener("submit", (event) => {
     event.preventDefault();
-    const form = event.target;
 
-    const xRadio = form.querySelector('input[name="x"]:checked');
     const yInput = document.getElementById("y-input");
     const rInput = document.getElementById("r-input");
 
+    const xRes = getSelectedX();
     const yRes = validateNumberInput(yInput, -3, 3);
     const rRes = validateNumberInput(rInput, 2, 5);
 
     const messages = [];
-    if (!xRadio) messages.push("X: Выберите значение");
+    if (xRes.error !== null) messages.push("X: " + xRes.error);
     if (yRes.error !== null) messages.push("Y: " + yRes.error);
     if (rRes.error !== null) messages.push("R: " + rRes.error);
 
@@ -318,7 +348,7 @@ document.getElementById("point").addEventListener("submit", (event) => {
 
     errorMessage.textContent = "";
 
-    const x = parseFloat(xRadio.value);
+    const x = xRes.value;
     const y = yRes.value;
     const r = rRes.value;
     const hit = isHit(x, y, r);
@@ -333,6 +363,13 @@ document.getElementById("point").addEventListener("submit", (event) => {
     savePoints(points);
 
     currentR = r;
+    renderTable();
+    redrawAll();
+});
+
+document.getElementById("clear-btn").addEventListener("click", () => {
+    localStorage.removeItem(pointsStorageKey);
+    errorMessage.textContent = "";
     renderTable();
     redrawAll();
 });
