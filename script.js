@@ -7,7 +7,6 @@ function setupCanvas() {
     canvas.width  = rect.width  * dpr;
     canvas.height = rect.height * dpr;
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 }
 
@@ -230,16 +229,16 @@ function isValidPoint(p) {
 
 function loadPoints() {
     try {
-            const raw = localStorage.getItem(pointsStorageKey);
-            const data = raw ? JSON.parse(raw) : [];
-            if (!Array.isArray(data)) return [];
-            return data
-                .filter(isValidPoint)
-                .map((p) => ({ ...p, hit: isHit(p.x, p.y, p.r) })); // результат пересчитываем, а не верим сохранённому
-        } catch {
-            return [];
-        }
+        const raw = localStorage.getItem(pointsStorageKey);
+        const data = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(data)) return [];
+        return data
+        .filter(isValidPoint)
+        .map((p) => ({ ...p, hit: isHit(p.x, p.y, p.r) })); // результат пересчитываем
+    } catch {
+         return [];
     }
+}
 
 function savePoints(points) {
     localStorage.setItem(pointsStorageKey, JSON.stringify(points));
@@ -308,7 +307,6 @@ function getSelectedX() {
         return { value: null, error: "Выберите значение" };
     }
 
-    // значение берём из JS-массива по позиции, а не из атрибута value
     return { value: ALLOWED_X[idx], error: null };
 }
 
